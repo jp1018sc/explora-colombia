@@ -97,7 +97,7 @@ function App() {
   return (
     <div className="contenedor">
       <header>
-        <h1>🇨🇴 Explora Colombia</h1>
+        <h1>Explora Colombia</h1>
         <p>Descubre los mejores destinos turísticos</p>
       </header>
 
