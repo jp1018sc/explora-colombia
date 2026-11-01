@@ -1,24 +1,38 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 
+// En producción usa la API de Render; en tu PC puedes definir VITE_API_URL
+// en un archivo .env.local para apuntar a http://localhost:3000/api/destinos
+const API =
+  import.meta.env.VITE_API_URL ||
+  "https://explora-colombia-7iks.onrender.com/api/destinos";
+
 function App() {
   const [destinos, setDestinos] = useState([]);
   const [nombre, setNombre] = useState("");
   const [departamento, setDepartamento] = useState("");
   const [descripcion, setDescripcion] = useState("");
   const [imagen, setImagen] = useState("");
-
-  const API = import.meta.env.VITE_API_URL||
-"http://localhost:3000/api/destinos";
+  const [cargando, setCargando] = useState(true);
+  const [error, setError] = useState("");
 
   // Consultar los destinos
   const cargarDestinos = async () => {
     try {
+      setError("");
       const respuesta = await fetch(API);
+
+      if (!respuesta.ok) {
+        throw new Error("No se pudieron cargar los destinos");
+      }
+
       const datos = await respuesta.json();
       setDestinos(datos);
     } catch (error) {
       console.error("Error:", error);
+      setError("No se pudo conectar con el servidor. Intenta de nuevo en unos segundos.");
+    } finally {
+      setCargando(false);
     }
   };
 
@@ -54,7 +68,6 @@ function App() {
       setImagen("");
 
       cargarDestinos();
-
     } catch (error) {
       alert(error.message);
     }
@@ -76,7 +89,6 @@ function App() {
       }
 
       cargarDestinos();
-
     } catch (error) {
       alert(error.message);
     }
@@ -84,7 +96,6 @@ function App() {
 
   return (
     <div className="contenedor">
-
       <header>
         <h1>🇨🇴 Explora Colombia</h1>
         <p>Descubre los mejores destinos turísticos</p>
@@ -94,7 +105,6 @@ function App() {
         <h2>Agregar nuevo destino</h2>
 
         <form onSubmit={agregarDestino}>
-
           <input
             type="text"
             placeholder="Nombre del destino"
@@ -125,19 +135,25 @@ function App() {
             onChange={(e) => setImagen(e.target.value)}
           />
 
-          <button type="submit">
-            Agregar destino
-          </button>
-
+          <button type="submit">Agregar destino</button>
         </form>
       </section>
 
       <section className="lista">
         <h2>Destinos disponibles</h2>
 
+        {cargando && (
+          <p>Cargando destinos... (la primera carga puede tardar hasta un minuto)</p>
+        )}
+
+        {error && <p>{error}</p>}
+
+        {!cargando && !error && destinos.length === 0 && (
+          <p>No hay destinos todavía. ¡Agrega el primero!</p>
+        )}
+
         {destinos.map((destino) => (
           <article className="destino" key={destino.id}>
-
             {destino.imagen && (
               <img
                 className="foto"
@@ -159,12 +175,9 @@ function App() {
             >
               Eliminar
             </button>
-
           </article>
         ))}
-
       </section>
-
     </div>
   );
 }
