@@ -222,3 +222,10 @@ button:active {
     width: 100%;
   }
 }
+
+body {
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0.35)),
+    url("/fondo.jpeg") center / cover no-repeat fixed;
+  min-height: 100vh;
+}
